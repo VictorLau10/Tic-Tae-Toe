@@ -1,0 +1,295 @@
+/*
+3
+Victor L
+Tic-Tac-Toe 
+*/
+
+//Constants
+var line;
+var numTurns = 0;
+var numTurns2 = 0;
+var maxTurns = 9;
+var playerTurn = 1;
+var playerTurnShape = "X";
+var centerX = getWidth() / 2;
+var centerY = getHeight() / 2;
+var xy;
+var centerBoxW = getWidth() / 6; 
+var centerBoxH = getHeight() / 6;
+var SHAPE_SIZE = 40;
+var LINE_WIDTH = 5;
+var gameWon;
+var counter = 0;
+
+//Boxes
+var box1 = 0;
+var box2 = 0;
+var box3 = 0;
+var box4 = 0;
+var box5 = 0;
+var box6 = 0;
+var box7 = 0;
+var box8 = 0;
+var box9 = 0;
+/*
+Order of Boxes
+1  2  3
+4  5  6
+7  8  9 
+*/
+
+function start() {
+    grid(getWidth()/3, 0, getWidth()/3, getHeight());
+    grid(getWidth()-getWidth()/3, 0, getWidth()-getWidth()/3, getHeight());
+    grid(0, getHeight()/3, getWidth(), getHeight()/3);
+    grid(0, getHeight()-getHeight()/3, getWidth(), getHeight()-getHeight()/3);
+    
+    println("Player " + playerTurn + "'s turn. (" + playerTurnShape + ")");
+    mouseClickMethod(drawShape);
+}
+
+function grid(x1, y1, x2, y2){
+    line = new Line(x1, y1, x2, y2);
+    line.setLineWidth(LINE_WIDTH);
+    add(line);
+}
+
+function drawShape(e) {
+    //Finds the center of the box the shape should be in
+    var x = getWidth() / 3 * Math.floor(e.getX() / (getWidth() / 3));
+    var y = getHeight() / 3 * Math.floor(e.getY() / (getHeight() / 3));
+    xy = Math.floor(x + y);
+    
+    inputValue();
+
+    //Determines if an X or O needs to be drawn, adds a turn
+    numTurns++;
+    numTurns2 = numTurns - 1;
+    if (numTurns == maxTurns) {
+        results();
+    }
+    if (numTurns == maxTurns + 1) {
+        numTurns--;
+        stopGame();
+    } else if(numTurns != maxTurns + 1) {
+        if (numTurns % 2 == 1) {
+            drawX(x, y);
+            playerTurn++;
+        } else if (numTurns % 2 == 0) {
+            drawO(x, y);
+            playerTurn--;
+        }
+        if (playerTurn == 2) {
+            playerTurnShape = "O";
+        } else if (playerTurn == 1) {
+            playerTurnShape = "X";
+        }
+        //Prints out the notification letting players know who's turn it is
+        if (numTurns < 9) {
+            println("Player " + playerTurn + "'s turn. (" + playerTurnShape + ")");
+        }
+    }
+    winDetection();
+}
+
+function drawX(x, y) {
+    //Tests the current box to see if an object is occupying it
+    var shape = getElementAt(x + centerBoxW, y + centerBoxH);
+    if (shape != null) {
+        invalid();
+    } else {
+        //Draws an X
+        var leftSide = x + centerBoxW - SHAPE_SIZE;
+        var rightSide = x + centerBoxW + SHAPE_SIZE;
+        var top = y + centerBoxH - SHAPE_SIZE;
+        var bottom = y + centerBoxH + SHAPE_SIZE;
+        
+        var leftLine = new Line(leftSide, top, rightSide, bottom);
+        add(leftLine);
+        var rightLine = new Line(rightSide, top, leftSide, bottom);
+        add(rightLine);
+    }
+}
+
+function drawO(x, y) {
+    //Tests the current box to see if an object is occupying it
+    var shape = getElementAt(x + centerBoxW, y + centerBoxH);
+    if (shape != null) {
+        invalid();
+    } else {
+        //Draws an O
+        var circle = new Circle(SHAPE_SIZE);
+        circle.setColor(Color.white);
+        circle.setPosition(x + centerBoxW, y + centerBoxH);
+        circle.setBorderWidth(LINE_WIDTH);
+        add(circle);
+    }
+}
+
+function inputValue() {
+    //Testing if something is occupying the selected box
+    if (xy == 0) {
+        if (box1 == 0) {
+            box1 = playerTurn;
+        }
+    } else if (xy == 133) {
+        if (box2 == 0) {
+            box2 = playerTurn;
+        }
+    } else if (xy == 266) {
+        if (box3 == 0) {
+            box3 = playerTurn;
+        }
+    } else if (xy == 160) {
+        if (box4 == 0) {
+            box4 = playerTurn;
+        }
+    } else if (xy == 293) {
+        if (box5 == 0) {
+            box5 = playerTurn;
+        }
+    } else if (xy == 426) {
+        if (box6 == 0) {
+            box6 = playerTurn;
+        }
+    } else if (xy == 320) {
+        if (box7 == 0) {
+            box7 = playerTurn;
+        }
+    } else if (xy == 453) {
+        if (box8 == 0) {
+            box8 = playerTurn;
+        }
+    } else if (xy == 586) {
+        if (box9 == 0) {
+            box9 = playerTurn;
+        }
+    }
+}
+
+function winDetection() {
+    //Detects if there is a win on the board
+    var topWin = box1 * box2 * box3;
+    var middleHWin = box4 * box5 * box6;
+    var bottomWin = box7 * box8 * box9;
+    var leftWin = box1 * box4 * box7;
+    var middleVWin = box2 * box5 * box8;
+    var rightWin = box3 * box6 * box9;
+    var diagonalLWin = box1 * box5 * box9;
+    var diagonalRWin = box3 * box5 * box7;
+
+    //X
+    if (topWin == 1) {
+        results();
+        gameWon = true;
+    }
+    if (middleHWin == 1) {
+        results();
+        gameWon = true;
+    }
+    if (bottomWin == 1) {
+        results();
+        gameWon = true;
+    }
+    if (leftWin == 1) {
+        results();
+        gameWon = true;
+    }
+    if (middleVWin == 1) {
+        results();
+        gameWon = true;
+    }
+    if (rightWin == 1) {
+        results();
+        gameWon = true;
+    }
+    if (diagonalLWin == 1) {
+        results();
+        gameWon = true;
+    }
+    if (diagonalRWin == 1) {
+        results();
+        gameWon = true;
+    }
+
+    //O
+    if (topWin == 8) {
+        results();
+        gameWon = true;
+    } 
+    if (middleHWin == 8) {
+        results();
+        gameWon = true;
+    }
+    if (bottomWin == 8) {
+        results();
+        gameWon = true;
+    }
+    if (leftWin == 8) {
+        results();
+        gameWon = true;
+    }
+    if (middleVWin == 8) {
+        results();
+        gameWon = true;
+    } 
+    if (rightWin == 8) {
+        results();
+        gameWon = true;
+    }
+    if (diagonalLWin == 8) {
+        results();
+        gameWon = true;
+    }
+    if (diagonalRWin == 8) {
+        results();
+        gameWon = true;
+    }
+}
+
+function invalid() {
+    //Notifies players that the current slot is occupied, and goes back a turn
+    println("Invalid Slot!");
+    takeOpposite();
+    numTurns = numTurns2;
+}
+
+function results() {
+    //Let's the players examine the board before proceeding to the final end screen
+    if (counter == 0) {
+        println("Game is over. ");
+        println("Click to proceed. ");
+        counter++;
+    }
+    numTurns = maxTurns;
+}
+
+function stopGame() {
+    //Displays end screen
+    removeAll();
+    if (playerTurnShape == "X") {
+        playerTurn = 2;
+    } else if (playerTurnShape == "O") {
+        playerTurn = 1;
+    }
+    var endScreen = new Text("Player " + playerTurn +" won the game!", "15pt Arial");
+    endScreen.setPosition(centerX - (endScreen.getWidth() / 2), centerY);
+    if (gameWon == true) {
+        add(endScreen);   
+    } else {
+        endScreen.setText("Game ended in a draw. ");
+        add(endScreen);
+    }
+    numTurns = 10;
+}
+
+function takeOpposite() {
+    //Takes the opposite player turn number, makes sure the value is not above 2
+    if (playerTurn == 1) {
+        playerTurn--;
+    } else if (playerTurn == 2) {
+        playerTurn++;
+    } else if (playerTurn < 2) {
+        playerTurn = 1;
+    }
+}
